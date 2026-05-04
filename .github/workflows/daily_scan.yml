@@ -9,6 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    # PERBAIKAN: Memberikan izin tulis agar bisa push log_rekomendasi_swing_v3.csv
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,6 +25,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install pandas numpy yfinance xgboost scikit-learn requests
 
       - name: Run Scanner
@@ -36,9 +42,9 @@ jobs:
           # Cek apakah file benar-benar ada sebelum git add
           if [ -f log_rekomendasi_swing_v3.csv ]; then
             git add log_rekomendasi_swing_v3.csv
-            # Commit hanya jika ada perubahan (agar tidak error jika file sama)
+            # Commit hanya jika ada perubahan agar tidak exit dengan error jika tidak ada sinyal baru
             git commit -m "Update log harian [skip ci]" || echo "No changes to commit"
             git push
           else
-            echo "File log tidak ditemukan, melewatkan proses commit."
+            echo "File log tidak ditemukan atau tidak ada sinyal baru hari ini."
           fi
